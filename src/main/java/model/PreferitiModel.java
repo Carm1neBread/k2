@@ -3,6 +3,7 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -73,56 +74,59 @@ public class PreferitiModel {
 			}
 	}
 	
-	public synchronized Collection<ProductBean> inserisci(String email, int codice, Collection<ProductBean> preferito) {
-		String sql = "INSERT INTO Preferiti(codiceProdotto, emailCliente) VALUES (?, ?)";
-		
-		Connection connection = null;
-		try {
-			connection = DriverManagerConnectionPool.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			preparedStatement.setInt(1, codice);
-			preparedStatement.setString(2, email);
-
-			preparedStatement.executeUpdate();
-			connection.commit();
-			
-			Connection con = null;
-			String sql2 = "SELECT * FROM Prodotto WHERE codice = ?";
-			try {
-				con = DriverManagerConnectionPool.getConnection();
-				PreparedStatement ps = con.prepareStatement(sql2);
-				ps.setInt(1, codice);
-				ResultSet rs = ps.executeQuery();
-				
-				while (rs.next()) {
-					ProductBean bean = new ProductBean();
-					bean.setCodice(rs.getInt("codice"));
-					bean.setNome(rs.getString("nome"));
-					bean.setDescrizione(rs.getString("descrizione"));
-					bean.setPrezzo(rs.getDouble("prezzo"));
-					bean.setSpedizione(rs.getDouble("speseSpedizione"));
-					bean.setEmail(rs.getString("emailVenditore"));
-					bean.setTag(rs.getString("tag"));
-					bean.setTipologia(rs.getString("nomeTipologia"));
-					bean.setData(rs.getDate("dataAnnuncio"));
-					bean.setImmagine(rs.getString("model"));
-					
-					preferito.add(bean);
-					return preferito;
-				}
-			}
-			catch (Exception e){
-				return preferito;
-			}
-		}
-		catch (Exception e) {
-			return preferito;
-		}
-		finally {
-			if (connection != null) {
-				DriverManagerConnectionPool.releaseConnection(connection);
-			}
-		}
-		return preferito;
+	public synchronized Collection<ProductBean> doRetrieveAll(String where, List<Object> params) {
+	    Connection connection = null;
+	    PreparedStatement preparedStatement = null;
+	    ResultSet resultSet = null;
+	    Collection<ProductBean> products = new LinkedList<ProductBean>();
+	    
+	    String selectSQL = "SELECT * FROM Product";
+	    if (where != null && !where.equals("")) {
+	        selectSQL += " WHERE " + where;
+	    }
+	    
+	    try {
+	        connection = DriverManagerConnectionPool.getConnection();
+	        preparedStatement = connection.prepareStatement(selectSQL);
+	        
+	        // Impostazione dei parametri nella query preparata
+	        for (int i = 0; i < params.size(); i++) {
+	            preparedStatement.setObject(i + 1, params.get(i));
+	        }
+	        
+	        resultSet = preparedStatement.executeQuery();
+	        
+	        while (resultSet.next()) {
+	            ProductBean bean = new ProductBean();
+	            bean.setCodice(resultSet.getInt("codice"));
+	            bean.setNome(resultSet.getString("nome"));
+	            bean.setDescrizione(resultSet.getString("descrizione"));
+	            bean.setPrezzo(resultSet.getDouble("prezzo"));
+	            bean.setSpedizione(resultSet.getDouble("speseSpedizione"));
+	            bean.setEmail(resultSet.getString("emailVenditore"));
+	            bean.setTag(resultSet.getString("tag"));
+	            bean.setTipologia(resultSet.getString("nomeTipologia"));
+	            bean.setData(resultSet.getDate("dataAnnuncio"));
+	            bean.setImmagine(resultSet.getString("model"));
+	            
+	            products.add(bean);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            if (resultSet != null)
+	                resultSet.close();
+	            if (preparedStatement != null)
+	                preparedStatement.close();
+	            if (connection != null)
+	                DriverManagerConnectionPool.releaseConnection(connection);
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    return products;
 	}
+
 }
