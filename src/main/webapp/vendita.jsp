@@ -27,7 +27,7 @@
 			<div class="user-details">
 				<div class="input-box">
 					<span class="details">Nome prodotto</span>
-					<input type="text" name="nome" maxlength="50" placeholder="Inserire nome prodotto" autofocus required/>
+					<input type="text" name="nome" required pattern="[^<>\/]+" title="I caratteri <, > e / non sono consentiti" maxlength="50" placeholder="Inserire nome prodotto" autofocus required/>
 				</div>
 				<div class="input-box">
 					<span class="details">Prezzo</span>
@@ -60,7 +60,7 @@
 				</div>
 				<div class="input-box">
 					<span class="details">Descrizione</span>
-					<textarea id="descrizione" name="descrizione" rows="4" cols="60" style="resize: none; width: 450px; height: 80px" required></textarea> <!-- 93 -->
+					<textarea id="descrizione" name="descrizione" required pattern="[^<>\/]+" title="I caratteri <, > e / non sono consentiti" rows="4" cols="60" style="resize: none; width: 450px; height: 80px" required></textarea> <!-- 93 -->
 				</div>
 			</div>
 			<div class="button">
