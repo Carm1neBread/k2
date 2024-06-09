@@ -14,8 +14,6 @@ import javax.servlet.http.HttpSession;
 
 import model.OrderBean;
 import model.OrderModel;
-import model.ProductBean;
-
 /**
  * Servlet implementation class AdminControl
  */
@@ -55,7 +53,8 @@ public class AdminControl extends HttpServlet {
 				request.getSession().setAttribute("listaOrdini", ordini);
 				request.getSession().setAttribute("ControlOrd", false);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				 RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
+		         dispatcher.forward(request, response); // Reindirizza a una pagina di errore
 			}
 			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/controllo-ordini.jsp?email=" + email);
 			dispatcher.forward(request, response);

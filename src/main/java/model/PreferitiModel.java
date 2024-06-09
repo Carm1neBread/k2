@@ -8,6 +8,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import javax.servlet.RequestDispatcher;
 
 public class PreferitiModel {
@@ -112,7 +115,8 @@ public class PreferitiModel {
 	            products.add(bean);
 	        }
 	    } catch (SQLException e) {
-	        e.printStackTrace();
+	    	RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
+            dispatcher.forward(request, response); // Reindirizza a una pagina di errore
 	    } finally {
 	        try {
 	            if (resultSet != null)
@@ -122,7 +126,8 @@ public class PreferitiModel {
 	            if (connection != null)
 	                DriverManagerConnectionPool.releaseConnection(connection);
 	        } catch (SQLException e) {
-	            e.printStackTrace();
+	        	RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
+	            dispatcher.forward(request, response); // Reindirizza a una pagina di errore
 	        }
 	    }
 	    

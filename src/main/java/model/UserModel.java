@@ -5,6 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Collection;
 import java.util.LinkedList;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import javax.servlet.RequestDispatcher;
 
 public class UserModel {
 	public synchronized Collection<String> retrieveAllEmail() {
@@ -66,7 +70,8 @@ public class UserModel {
 			return bean;
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
+            dispatcher.forward(request, response);
 			return bean;
 		}
 	}

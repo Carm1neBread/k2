@@ -23,6 +23,11 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import model.ProductBean;
 import model.ProductModel;
 
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class Vendita
  */
@@ -98,7 +103,8 @@ public class Vendita extends HttpServlet {
 				model.doSave(product);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
+		         dispatcher.forward(request, response); // Reindirizza a una pagina di errore
 			}
 		    request.getSession().setAttribute("refreshProduct", true);
 		    request.getRequestDispatcher("/index.jsp").forward(request, response);
