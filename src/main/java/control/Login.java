@@ -3,8 +3,8 @@ package control;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -18,36 +18,21 @@ import model.DriverManagerConnectionPool;
 import model.OrderModel;
 import model.UserBean;
 
-
 import javax.servlet.RequestDispatcher;
-/**
- * Servlet implementation class Login
- */
+
 @WebServlet("/Login")
 public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
     public Login() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doPost(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		String email = request.getParameter("j_email");
 		String password = request.getParameter("j_password");
 		String redirectedPage = "/loginPage.jsp";
@@ -87,33 +72,28 @@ public class Login extends HttpServlet {
 					}
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			redirectedPage = "/loginPage.jsp";
 		}
 		if (control == false) {
 			request.getSession().setAttribute("login-error", true);
-		}
-		else {
+		} else {
 			request.getSession().setAttribute("login-error", false);
 		}
 		response.sendRedirect(request.getContextPath() + redirectedPage);
 	}
 		
-	private String checkPsw(String psw) {
-		MessageDigest md = null;
-		try {
-			md = MessageDigest.getInstance("MD5");
-		}
-		catch (Exception e) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/error.jsp");
-	         dispatcher.forward(request, response); // Reindirizza a una pagina di errore
-		}
+	private String checkPsw(String psw) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("SHA-256");
 		byte[] messageDigest = md.digest(psw.getBytes());
 		BigInteger number = new BigInteger(1, messageDigest);
 		String hashtext = number.toString(16);
 		
+		// Now we need to zero pad it if you actually want the full 64 chars.
+		while (hashtext.length() < 64) {
+			hashtext = "0" + hashtext;
+		}
+		
 		return hashtext;
 	}
-
 }
